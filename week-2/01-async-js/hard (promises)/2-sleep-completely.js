@@ -5,6 +5,13 @@
  */
 
 function sleep(milliseconds) {
-}
-
-module.exports = sleep;
+    const start = Date.now();
+  
+    while (Date.now() - start < milliseconds) {
+      // do nothing and keep the thread running
+    }
+  }
+  
+  console.log("Start");
+  sleep(5000);
+  console.log("End");
