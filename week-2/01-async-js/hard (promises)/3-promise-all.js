@@ -4,34 +4,41 @@
  * Return a promise.all which return the time in milliseconds it takes to complete the entire operation.
  */
 
-function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-  
-  function waitOneSecond() {
-    return delay(1000);
-  }
-  
-  function waitTwoSeconds() {
-    return delay(2000);
-  }
-  
-  function waitThreeSeconds() {
-    return delay(3000);
-  }
-  
-  function calculateTime() {
-    const startTime = Date.now();
-  
-    return Promise.all([
-      waitOneSecond(),
-      waitTwoSeconds(),
-      waitThreeSeconds(),
-    ]).then(() => {
-      const endTime = Date.now();
-      const totalTime = endTime - startTime;
-      console.log(`All promises resolved in ${totalTime} milliseconds`);
-    });
-  }
-  
-  calculateTime();
+function wait1(t) {
+  return new Promise((res, rej) => {
+      setTimeout(() => {
+          res();
+      }, t);
+  })
+}
+
+function wait2(t) {
+  return new Promise((res, rej) => {
+      setTimeout(() => {
+          res();
+      }, t);
+  })
+}
+
+function wait3(t) {
+  return new Promise((res, rej) => {
+      setTimeout(() => {
+          res();
+      }, t);
+  })
+}
+
+function calculateTime(t1, t2, t3) {
+  const start = new Date().getTime();
+  let p1 = wait1(t1);
+  let p2 = wait2(t2);
+  let p3 = wait3(t3);
+
+  return Promise.all([p1, p2, p3]).then(results => {
+      const end = new Date().getTime();
+      console.log((end - start) * 1000);
+      return (end - start)*1000;
+  })
+}
+
+module.exports = calculateTime;

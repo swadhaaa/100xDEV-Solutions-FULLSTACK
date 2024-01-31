@@ -3,15 +3,8 @@
  * During this time the thread should not be able to do anything else.
  * the function should return a promise just like before
  */
-
 function sleep(milliseconds) {
-    const start = Date.now();
-  
-    while (Date.now() - start < milliseconds) {
-      // do nothing and keep the thread running
-    }
-  }
-  
-  console.log("Start");
-  sleep(5000);
-  console.log("End");
+  return new Promise(res => setTimeout(res,milliseconds));
+}
+
+module.exports = sleep;
