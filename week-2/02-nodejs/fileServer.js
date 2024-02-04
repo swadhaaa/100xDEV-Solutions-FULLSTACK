@@ -17,5 +17,47 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 
+const FILES_DIRECTORY = path.join(__dirname, 'files');
 
+
+// get a list of files
+app.get('/files', (req, res) => {
+  fs.readdir(FILES_DIRECTORY, (err, files) => {  // readdir reads the contents of a directory
+    if (err) {
+      return res.status(500).send('Internal Server Error');
+    }
+
+    res.status(200).json(files);
+  });
+});
+
+// get the contents of a specific file
+app.get('/file/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(FILES_DIRECTORY, filename);
+
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        return res.status(404).send('File not found');
+      }
+      return res.status(500).send('Internal Server Error');
+    }
+
+    // File content found
+    res.status(200).send(data);
+  });
+});
+
+// Invalid Routes
+app.all('*', (req, res) => {
+  res.status(404).send('Route not found');
+});
+
+// When running locally uncomment the below code, when testing keep it commented
+/* 
+  app.listen(3001, () => {
+   console.log('Server started on port 3001');
+  });
+*/
 module.exports = app;
