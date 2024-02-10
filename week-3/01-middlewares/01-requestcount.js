@@ -10,6 +10,14 @@ let requestCount = 0;
 // maintain a count of the number of requests made to the server in the global
 // requestCount variable
 
+// MIDDLEWARE //
+//////////////////////////////////////
+app.use(function(req, res, next) { // Middleware at the top of the stack
+  requestCount++;
+  next(); // pass control to the next handler
+});
+//////////////////////////////////////
+
 app.get('/user', function(req, res) {
   res.status(200).json({ name: 'john' });
 });

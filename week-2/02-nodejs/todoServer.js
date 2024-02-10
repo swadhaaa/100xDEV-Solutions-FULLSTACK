@@ -39,11 +39,97 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-  const express = require('express');
-  const bodyParser = require('body-parser');
-  
-  const app = express();
-  
-  app.use(bodyParser.json());
-  
-  module.exports = app;
+
+// Run the app locally using `npm run todoServer` command in terminal
+// Uncomment the app.listen() code when running locally
+const fs = require('fs');
+const uuid = require('uuid');
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// read todos from a file on server start
+const TODOS_FILE = 'todos.json';
+
+let todos = [];
+try {
+  const todosData = fs.readFileSync(TODOS_FILE);
+  todos = JSON.parse(todosData);
+} catch (error) {
+  console.error('Error reading todos file:', error);
+}
+
+app.get('/todos', (req, res) => {
+  res.status(200).json(todos);
+});
+
+app.get('/todos/:id', (req, res) => {
+  const todo = todos.find((todo) => todo.id === req.params.id);
+  if (todo) {
+    res.status(200).json(todo);
+  } else {
+    res.status(404).json({ error: 'Todo not found' });
+  }
+});
+
+app.post('/todos', (req, res) => {
+  const todo = req.body;
+  todo.id = uuid.v4();
+  todo.completed = todo.completed || false; // Default to false if not defined
+
+  todos.push(todo);
+  saveTodosToFile();
+
+  res.status(201).json({ id: todo.id });
+});
+
+app.put('/todos/:id', (req, res) => {
+  const todo = todos.find((todo) => todo.id === req.params.id);
+  if (todo) {
+    todo.title = req.body.title;
+    todo.description = req.body.description;
+    todo.completed = req.body.completed || false; // default false
+
+    saveTodosToFile();
+
+    res.status(200).json(todo);
+  } else {
+    res.status(404).json({ error: 'Todo not found' });
+  }
+});
+
+app.delete('/todos/:id', (req, res) => {
+  const todoIndex = todos.findIndex((todo) => todo.id === req.params.id);
+  if (todoIndex !== -1) {
+    todos.splice(todoIndex, 1);
+    saveTodosToFile();
+
+    res.status(200).json({ message: 'Deleted' });
+  } else {
+    res.status(404).json({ error: 'Todo not found' });
+  }
+});
+
+app.all('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// When running locally uncomment the below code, when testing keep it commented
+/* 
+  app.listen(3001, () => {
+   console.log('Server started on port 3001');
+  });
+*/
+function saveTodosToFile() {
+  try {
+    fs.writeFileSync(TODOS_FILE, JSON.stringify(todos, null, 2));
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+module.exports = app;
