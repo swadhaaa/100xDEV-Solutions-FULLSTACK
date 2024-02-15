@@ -23,4 +23,12 @@ app.get('/errorCount', function(req, res) {
   res.status(200).json({ errorCount });
 });
 
+// GLOBAL ERROR HANDLING MIDDLEWARE //
+//////////////////////////////////////
+app.use((err, req, res, next) => {
+  errorCount++;
+  res.status(404).end(); // end the response process
+})
+//////////////////////////////////////
+
 module.exports = app;

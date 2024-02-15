@@ -16,6 +16,23 @@ setInterval(() => {
     numberOfRequestsForUser = {};
 }, 1000)
 
+// MIDDLEWARE //
+//////////////////////////////////////
+app.use((req, res, next) => { // Middleware at the top of the application so it runs for all requests
+  let user_id = req.headers['user-id'] 
+  if (!numberOfRequestsForUser[user_id]) { // Initialize the count for the user if it doesn't exist
+    numberOfRequestsForUser[user_id] = 0;
+  }
+  numberOfRequestsForUser[user_id] += 1
+  if (numberOfRequestsForUser[user_id] > 4) {
+    res.status(404).end(); // END THE RESPONSE PROCESS
+  } else {
+    // otherwise let the user access other routes
+    next();
+  }
+})
+//////////////////////////////////////
+
 app.get('/user', function(req, res) {
   res.status(200).json({ name: 'john' });
 });

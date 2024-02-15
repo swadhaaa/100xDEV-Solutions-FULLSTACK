@@ -1,4 +1,8 @@
 const jwt = require('jsonwebtoken');
+// INCLUDE ZOD LIBRARY FOR VALIDATION //
+////////////////////////////
+const { z } = require('zod')
+////////////////////////////
 const jwtPassword = 'secret';
 
 
@@ -15,6 +19,25 @@ const jwtPassword = 'secret';
  */
 function signJwt(username, password) {
     // Your code here
+    //////////////////////////////////////////////
+
+    const schema = z.object({
+        username: z.string().email(),
+        password: z.string().min(6)
+    })
+
+    const payload = {
+        username,
+        password
+    }
+    let result = schema.safeParse(payload)
+
+    if (result.success) {
+        return jwt.sign(payload, jwtPassword)
+    } else {
+        return null;
+    }
+    //////////////////////////////////////////////
 }
 
 /**
@@ -25,8 +48,17 @@ function signJwt(username, password) {
  *                    Returns false if the token is invalid, expired, or not verified
  *                    using the secret key.
  */
+
 function verifyJwt(token) {
     // Your code here
+    /////////////////////////////////////
+    try {
+        const decoded = jwt.verify(token, jwtPassword);
+        return true;
+    } catch (error) {
+        return false;
+    }
+    /////////////////////////////////////
 }
 
 /**
@@ -38,12 +70,21 @@ function verifyJwt(token) {
  */
 function decodeJwt(token) {
     // Your code here
+    /////////////////////////////////////
+    try {
+        let decoded = jwt.decode(token);
+        if (!decoded) { return false; }
+        return true;
+    } catch (error) {
+        return false;
+    }
+    /////////////////////////////////////
 }
 
 
 module.exports = {
-  signJwt,
-  verifyJwt,
-  decodeJwt,
-  jwtPassword,
+    signJwt,
+    verifyJwt,
+    decodeJwt,
+    jwtPassword,
 };
