@@ -1,10 +1,6 @@
-const jwt = require('jsonwebtoken');
-// INCLUDE ZOD LIBRARY FOR VALIDATION //
-////////////////////////////
-const { z } = require('zod')
-////////////////////////////
-const jwtPassword = 'secret';
-
+const jwt = require("jsonwebtoken");
+const jwtPassword = "secret";
+const zod = require("zod");
 
 /**
  * Generates a JWT for a given username and password.
@@ -18,26 +14,16 @@ const jwtPassword = 'secret';
  *                        the password does not meet the length requirement.
  */
 function signJwt(username, password) {
-    // Your code here
-    //////////////////////////////////////////////
-
-    const schema = z.object({
-        username: z.string().email(),
-        password: z.string().min(6)
-    })
-
-    const payload = {
-        username,
-        password
-    }
-    let result = schema.safeParse(payload)
-
-    if (result.success) {
-        return jwt.sign(payload, jwtPassword)
-    } else {
-        return null;
-    }
-    //////////////////////////////////////////////
+  // Your code here
+  const emailSchema = zod.string().email();
+  const passwordSchema = zod.string().min(6);
+  const parsedEmail = emailSchema.safeParse(username);
+  const parsedPass = passwordSchema.safeParse(password);
+  if (!(parsedEmail.success && parsedPass.success)) {
+    return null;
+  }
+  let token = jwt.sign({ username: username }, jwtPassword);
+  return token;
 }
 
 /**
@@ -48,17 +34,14 @@ function signJwt(username, password) {
  *                    Returns false if the token is invalid, expired, or not verified
  *                    using the secret key.
  */
-
 function verifyJwt(token) {
-    // Your code here
-    /////////////////////////////////////
-    try {
-        const decoded = jwt.verify(token, jwtPassword);
-        return true;
-    } catch (error) {
-        return false;
-    }
-    /////////////////////////////////////
+  // Your code here
+  try{
+    const verified = jwt.verify(token,jwtPassword)
+    return true
+  }catch(err){
+    return false
+  }
 }
 
 /**
@@ -69,22 +52,17 @@ function verifyJwt(token) {
  *                         Returns false if the token is not a valid JWT format.
  */
 function decodeJwt(token) {
-    // Your code here
-    /////////////////////////////////////
-    try {
-        let decoded = jwt.decode(token);
-        if (!decoded) { return false; }
-        return true;
-    } catch (error) {
-        return false;
-    }
-    /////////////////////////////////////
+  // Your code here
+  const decoded = jwt.decode(token)
+  if(decoded){
+    return true
+  }
+  return false
 }
 
-
 module.exports = {
-    signJwt,
-    verifyJwt,
-    decodeJwt,
-    jwtPassword,
+  signJwt,
+  verifyJwt,
+  decodeJwt,
+  jwtPassword,
 };

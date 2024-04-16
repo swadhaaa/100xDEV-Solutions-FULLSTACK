@@ -1,6 +1,6 @@
-const request = require('supertest');
-const assert = require('assert');
-const express = require('express');
+const request = require("supertest");
+const assert = require("assert");
+const express = require("express");
 
 const app = express();
 let requestCount = 0;
@@ -10,23 +10,20 @@ let requestCount = 0;
 // maintain a count of the number of requests made to the server in the global
 // requestCount variable
 
-// MIDDLEWARE //
-//////////////////////////////////////
-app.use(function(req, res, next) { // Middleware at the top of the stack
+app.use((req, res, next) => {
   requestCount++;
-  next(); // pass control to the next handler
-});
-//////////////////////////////////////
-
-app.get('/user', function(req, res) {
-  res.status(200).json({ name: 'john' });
+  next();
 });
 
-app.post('/user', function(req, res) {
-  res.status(200).json({ msg: 'created dummy user' });
+app.get("/user", function (req, res) {
+  res.status(200).json({ name: "john" });
 });
 
-app.get('/requestCount', function(req, res) {
+app.post("/user", function (req, res) {
+  res.status(200).json({ msg: "created dummy user" });
+});
+
+app.get("/requestCount", function (req, res) {
   res.status(200).json({ requestCount });
 });
 

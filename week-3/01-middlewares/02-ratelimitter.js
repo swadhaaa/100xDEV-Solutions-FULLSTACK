@@ -1,6 +1,6 @@
-const request = require('supertest');
-const assert = require('assert');
-const express = require('express');
+const request = require("supertest");
+const assert = require("assert");
+const express = require("express");
 const app = express();
 // You have been given an express server which has a few endpoints.
 // Your task is to create a global middleware (app.use) which will
@@ -13,32 +13,30 @@ const app = express();
 
 let numberOfRequestsForUser = {};
 setInterval(() => {
-    numberOfRequestsForUser = {};
-}, 1000)
+  numberOfRequestsForUser = {};
+}, 1000);
 
-// MIDDLEWARE //
-//////////////////////////////////////
-app.use((req, res, next) => { // Middleware at the top of the application so it runs for all requests
-  let user_id = req.headers['user-id'] 
-  if (!numberOfRequestsForUser[user_id]) { // Initialize the count for the user if it doesn't exist
-    numberOfRequestsForUser[user_id] = 0;
-  }
-  numberOfRequestsForUser[user_id] += 1
-  if (numberOfRequestsForUser[user_id] > 4) {
-    res.status(404).end(); // END THE RESPONSE PROCESS
+app.use((req, res, next) => {
+  userId = req.headers["user-id"];
+  if (numberOfRequestsForUser.userId) {
+    numberOfRequestsForUser.userId = numberOfRequestsForUser.userId + 1;
   } else {
-    // otherwise let the user access other routes
-    next();
+    numberOfRequestsForUser.userId = 1;
   }
-})
-//////////////////////////////////////
 
-app.get('/user', function(req, res) {
-  res.status(200).json({ name: 'john' });
+  if (numberOfRequestsForUser.userId < 6) {
+    next();
+  } else {
+    res.status(404).send("go slow boiii");
+  }
 });
 
-app.post('/user', function(req, res) {
-  res.status(200).json({ msg: 'created dummy user' });
+app.get("/user", function (req, res) {
+  res.status(200).json({ name: "john" });
+});
+
+app.post("/user", function (req, res) {
+  res.status(200).json({ msg: "created dummy user" });
 });
 
 module.exports = app;
